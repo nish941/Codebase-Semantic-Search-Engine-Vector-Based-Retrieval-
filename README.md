@@ -1,4 +1,4 @@
-# Codebase-Semantic-Search-Engine-Vector-Based-Retrieval-
+# Codebase-Semantic-Search-Engine-Vector-Based-Retrieval
 Codebase Semantic Search Engine (Vector-Based Retrieval)
 
 # 🔍 Codebase Semantic Search Engine (Vector-Based Retrieval)
@@ -31,7 +31,7 @@ This project develops a cutting-edge search engine that allows developers to que
 ### Installation
 1.  Clone the repository:
     ```bash
-    git clone [Your-Repo-Link-Here]
+    git clone https://github.com/nish941/Codebase-Semantic-Search-Engine-Vector-Based-Retrieval
     cd codebase-semantic-search-engine
     ```
 2.  Install dependencies:
