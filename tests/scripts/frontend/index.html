@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Codebase Semantic Search Engine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .tagline {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .search-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 18px 25px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0 40px;
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .results-title {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .results-count {
+            background: #667eea;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.2s;
+        }
+
+        .result-item:hover {
+            transform: translateX(5px);
+            background: #f0f2f5;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .score-badge {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            color: #666;
+        }
+
+        .language-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .preview {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .highlighted-line {
+            background: #fff3cd;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .sidebar {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .stats-section {
+            margin-bottom: 30px;
+        }
+
+        .stats-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .no-results i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .search-btn {
+                width: 100%;
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-code"></i>
+            </div>
+            <h1>Codebase Semantic Search Engine</h1>
+            <p class="tagline">Search your codebase using natural language queries</p>
+        </header>
+
+        <div class="main-content">
+            <div class="left-column">
+                <div class="search-section">
+                    <div class="search-box">
+                        <input type="text" 
+                               class="search-input" 
+                               id="queryInput"
+                               placeholder="Ask about your code... e.g., 'Where is the authentication logic?'"
+                               autocomplete="off">
+                        <button class="search-btn" onclick="performSearch()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="topK">Results:</label>
+                            <select id="topK">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="searchType">Search Type:</label>
+                            <select id="searchType">
+                                <option value="hybrid" selected>Hybrid (Semantic + Keyword)</option>
+                                <option value="semantic">Semantic Only</option>
+                                <option value="keyword">Keyword Only</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="minScore">Min Score:</label>
+                            <input type="range" id="minScore" min="0" max="1" step="0.1" value="0.5">
+                            <span id="scoreValue">0.5</span>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>
+                                <input type="checkbox" id="includeExplanation" checked>
+                                Include AI Explanation
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-section">
+                    <div class="results-header">
+                        <h2 class="results-title">Search Results</h2>
+                        <div class="results-count" id="resultsCount">0 results</div>
+                    </div>
+
+                    <div class="loading" id="loadingIndicator">
+                        <div class="spinner"></div>
+                        <p>Searching codebase...</p>
+                    </div>
+
+                    <div class="no-results" id="noResults">
+                        <i class="fas fa-search"></i>
+                        <h3>No results yet</h3>
+                        <p>Enter a query above to search your codebase</p>
+                    </div>
+
+                    <div id="resultsContainer"></div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="stats-section">
+                    <h3 class="stats-title">
+                        <i class="fas fa-chart-bar"></i> Performance Stats
+                    </h3>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgResponseTime">0ms</div>
+                        <div class="stat-label">Avg Response Time</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="precisionScore">0.00</div>
+                        <div class="stat-label">Precision Score</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="indexSize">0</div>
+                        <div class="stat-label">Chunks Indexed</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="cacheHitRate">0%</div>
+                        <div class="stat-label">Cache Hit Rate</div>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <h3 class="stats-title">
+                        <i class="fas fa-lightbulb"></i> Search Tips
+                    </h3>
+                    <div class="stat-card">
+                        <ul style="list-style: none; padding: 0; color: #666;">
+                            <li style="margin-bottom: 10px; padding-left: 20px; position: relative;">
+                                <i class="fas fa-check" style="position: absolute; left: 0; color: #4CAF50;"></i>
+                                Use natural language like "functions that handle authentication"
+                            </li>
+                            <li style="margin-bottom: 10px; padding-left: 20px; position: relative;">
+                                <i class="fas fa-check" style="position: absolute; left: 0; color: #4CAF50;"></i>
+                                Be specific: "class for database connections" vs "database"
+                            </li>
+                            <li style="margin-bottom: 10px; padding-left: 20px; position: relative;">
+                                <i class="fas fa-check" style="position: absolute; left: 0; color: #4CAF50;"></i>
+                                Include language: "Python function to parse JSON"
+                            </li>
+                            <li style="margin-bottom: 10px; padding-left: 20px; position: relative;">
+                                <i class="fas fa-check" style="position: absolute; left: 0; color: #4CAF50;"></i>
+                                Use hybrid search for best results
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <h3 class="stats-title">
+                        <i class="fas fa-history"></i> Recent Queries
+                    </h3>
+                    <div class="stat-card">
+                        <div id="recentQueries"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Codebase Semantic Search Engine &copy; 2024 | Vector-Based Retrieval System</p>
+            <p style="font-size: 12px; margin-top: 5px; opacity: 0.7;">
+                Powered by Sentence-BERT, FAISS, and Elasticsearch
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const queryInput = document.getElementById('queryInput');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const resultsCount = document.getElementById('resultsCount');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const noResults = document.getElementById('noResults');
+        const minScoreSlider = document.getElementById('minScore');
+        const scoreValue = document.getElementById('scoreValue');
+        const recentQueries = document.getElementById('recentQueries');
+
+        // Stats elements
+        const avgResponseTime = document.getElementById('avgResponseTime');
+        const precisionScore = document.getElementById('precisionScore');
+        const indexSize = document.getElementById('indexSize');
+        const cacheHitRate = document.getElementById('cacheHitRate');
+
+        // Initialize stats
+        let searchStats = {
+            totalSearches: 0,
+            totalResponseTime: 0,
+            cacheHits: 0,
+            recentQueriesList: []
+        };
+
+        // Load stats from localStorage
+        function loadStats() {
+            const saved = localStorage.getItem('searchStats');
+            if (saved) {
+                searchStats = JSON.parse(saved);
+                updateStatsDisplay();
+                updateRecentQueries();
+            }
+            
+            // Get index size
+            fetch('/api/stats')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.index_info && data.index_info.num_chunks) {
+                        indexSize.textContent = data.index_info.num_chunks.toLocaleString();
+                    }
+                });
+        }
+
+        // Update stats display
+        function updateStatsDisplay() {
+            const avgTime = searchStats.totalSearches > 0 
+                ? Math.round(searchStats.totalResponseTime / searchStats.totalSearches)
+                : 0;
+            
+            avgResponseTime.textContent = `${avgTime}ms`;
+            
+            const hitRate = searchStats.totalSearches > 0
+                ? Math.round((searchStats.cacheHits / searchStats.totalSearches) * 100)
+                : 0;
+            
+            cacheHitRate.textContent = `${hitRate}%`;
+            
+            // Save to localStorage
+            localStorage.setItem('searchStats', JSON.stringify(searchStats));
+        }
+
+        // Update recent queries
+        function updateRecentQueries() {
+            recentQueries.innerHTML = '';
+            searchStats.recentQueriesList.slice(0, 5).forEach(query => {
+                const div = document.createElement('div');
+                div.style.padding = '8px 0';
+                div.style.borderBottom = '1px solid #eee';
+                div.style.cursor = 'pointer';
+                div.textContent = query;
+                div.onclick = () => {
+                    queryInput.value = query;
+                    performSearch();
+                };
+                recentQueries.appendChild(div);
+            });
+        }
+
+        // Update score value display
+        minScoreSlider.addEventListener('input', function() {
+            scoreValue.textContent = this.value;
+        });
+
+        // Handle Enter key in search input
+        queryInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Main search function
+        async function performSearch() {
+            const query = queryInput.value.trim();
+            if (!query) return;
+
+            // Update recent queries
+            if (!searchStats.recentQueriesList.includes(query)) {
+                searchStats.recentQueriesList.unshift(query);
+                searchStats.recentQueriesList = searchStats.recentQueriesList.slice(0, 10);
+                updateRecentQueries();
+            }
+
+            // Show loading
+            loadingIndicator.style.display = 'block';
+            noResults.style.display = 'none';
+            resultsContainer.innerHTML = '';
+
+            // Get search parameters
+            const topK = document.getElementById('topK').value;
+            const searchType = document.getElementById('searchType').value;
+            const minScore = parseFloat(document.getElementById('minScore').value);
+            const includeExplanation = document.getElementById('includeExplanation').checked;
+
+            // Prepare request
+            const startTime = performance.now();
+            const requestBody = {
+                query: query,
+                top_k: parseInt(topK),
+                use_hybrid: searchType === 'hybrid',
+                include_explanation: includeExplanation
+            };
+
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const endTime = performance.now();
+                const responseTime = endTime - startTime;
+
+                // Update stats
+                searchStats.totalSearches++;
+                searchStats.totalResponseTime += responseTime;
+                updateStatsDisplay();
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // Hide loading
+                loadingIndicator.style.display = 'none';
+
+                if (data.total_results === 0) {
+                    noResults.style.display = 'block';
+                    resultsCount.textContent = '0 results';
+                    return;
+                }
+
+                // Update results count
+                resultsCount.textContent = `${data.total_results} result${data.total_results !== 1 ? 's' : ''}`;
+
+                // Display results
+                data.results.forEach((result, index) => {
+                    if (result.similarity_score < minScore) return;
+
+                    const resultElement = createResultElement(result, index + 1);
+                    resultsContainer.appendChild(resultElement);
+                });
+
+                // Update precision score (simple heuristic)
+                if (data.results.length > 0) {
+                    const avgScore = data.results.reduce((sum, r) => sum + r.similarity_score, 0) / data.results.length;
+                    precisionScore.textContent = avgScore.toFixed(2);
+                }
+
+            } catch (error) {
+                loadingIndicator.style.display = 'none';
+                resultsContainer.innerHTML = `
+                    <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 8px; border: 1px solid #f5c6cb;">
+                        <h3 style="margin-bottom: 10px;">Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+                console.error('Search error:', error);
+            }
+        }
+
+        // Create result element
+        function createResultElement(result, rank) {
+            const div = document.createElement('div');
+            div.className = 'result-item';
+
+            // Format file path
+            const fileName = result.file_path.split('/').pop();
+            const path = result.file_path;
+
+            // Format content with highlighted lines
+            let content = result.content;
+            if (result.highlight_lines && result.highlight_lines.length > 0) {
+                const lines = content.split('\n');
+                const highlightedContent = lines.map((line, index) => {
+                    const lineNum = result.start_line + index + 1;
+                    if (result.highlight_lines.includes(lineNum)) {
+                        return `<span class="highlighted-line">${line}</span>`;
+                    }
+                    return line;
+                }).join('\n');
+                content = highlightedContent;
+            }
+
+            // Truncate long content
+            if (content.length > 500) {
+                content = content.substring(0, 500) + '...';
+            }
+
+            // Create HTML
+            div.innerHTML = `
+                <div class="result-header">
+                    <div>
+                        <strong>${rank}. ${fileName}</strong>
+                        <div class="file-info">
+                            <span>${path}</span>
+                            <span class="language-badge">${result.language}</span>
+                            <span>Lines ${result.start_line + 1}-${result.end_line + 1}</span>
+                        </div>
+                    </div>
+                    <div class="score-badge">${result.similarity_score.toFixed(3)}</div>
+                </div>
+                
+                ${result.explanation ? `
+                    <div style="background: #e3f2fd; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;">
+                        <i class="fas fa-info-circle"></i> ${result.explanation}
+                    </div>
+                ` : ''}
+                
+                <div class="preview">${escapeHtml(content)}</div>
+                
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button onclick="copyCode('${escapeHtml(result.content)}')" 
+                            style="background: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">
+                        <i class="fas fa-copy"></i> Copy Code
+                    </button>
+                    <button onclick="viewInContext('${result.file_path}', ${result.start_line}, ${result.end_line})"
+                            style="background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">
+                        <i class="fas fa-external-link-alt"></i> View Context
+                    </button>
+                </div>
+            `;
+
+            return div;
+        }
+
+        // Utility functions
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function copyCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied to clipboard!');
+            });
+        }
+
+        function viewInContext(filePath, startLine, endLine) {
+            alert(`Would open ${filePath} at lines ${startLine + 1}-${endLine + 1}\n\nThis feature would integrate with your code editor in production.`);
+        }
+
+        // Example
