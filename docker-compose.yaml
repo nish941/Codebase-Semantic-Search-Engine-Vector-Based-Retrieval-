@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    container_name: semantic-search-es
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - search-network
+
+  search-api:
+    build: .
+    container_name: semantic-search-api
+    depends_on:
+      - elasticsearch
+    environment:
+      - DEBUG=False
+      - ELASTICSEARCH_HOST=http://elasticsearch:9200
+      - ELASTICSEARCH_INDEX=codebase
+      - EMBEDDING_MODEL=sentence-transformers/all-mpnet-base-v2
+      - FAISS_INDEX_TYPE=IVF
+      - DEFAULT_TOPK=10
+      - MIN_SIMILARITY_SCORE=0.5
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./test_codebase:/app/test_codebase  # Mount test codebase
+    networks:
+      - search-network
+    command: python app.py
+
+volumes:
+  elasticsearch_data:
+
+networks:
+  search-network:
+    driver: bridge
