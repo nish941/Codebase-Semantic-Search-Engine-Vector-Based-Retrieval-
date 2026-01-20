@@ -1,10 +1,7 @@
-# Codebase-Semantic-Search-Engine-Vector-Based-Retrieval
-Codebase Semantic Search Engine (Vector-Based Retrieval)
-
 # 🔍 Codebase Semantic Search Engine (Vector-Based Retrieval)
 
 ## 💡 Overview
-This project develops a cutting-edge search engine that allows developers to query a codebase using **natural language**. Unlike traditional keyword search (like grep or basic full-text indexing), this system leverages vector embeddings to understand the *meaning* and *intent* of a query, returning code snippets that are semantically relevant, even if they don't contain the exact keywords. This significantly boosts developer productivity and code comprehension.
+I'm Nishita. This project develops a cutting-edge search engine that allows developers to query a codebase using **natural language**. Unlike traditional keyword search (like grep or basic full-text indexing), this system leverages vector embeddings to understand the *meaning* and *intent* of a query, returning code snippets that are semantically relevant, even if they don't contain the exact keywords. This significantly boosts developer productivity and code comprehension.
 
 ## ✨ Key Features & Impact
 
